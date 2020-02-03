@@ -20,6 +20,10 @@ export const PRAY_START = "PRAY_START"
 export const PRAY_SUCCESS = "PRAY_SUCCESS"
 export const PRAY_FAIL = "PRAY_FAIL"
 
+const baseURL = `https://backendtreasure.herokuapp.com`
+
+const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
+
 export const postRegistration = user => dispatch =>
 {
     dispatch({ type: REGISTER_USER_START })
@@ -42,7 +46,7 @@ export const postLogin = user => dispatch =>
 {
     dispatch({ type: LOGIN_USER_START })
 
-    axiosWithAuth().post(`${baseURL}/api/auth/login`, user)
+    axios.post(`${baseURL}/api/auth/login`, user)
     .then(res =>
     {
         console.log("res from postLogin:", res)
@@ -60,7 +64,7 @@ export const getUserRooms = userId => dispatch =>
 {
     dispatch({ type: GET_USER_ROOMS_START })
 
-    axiosWithAuth().get(`${baseURL}/api/map/${userId}`)
+    axaBE().get(`${baseURL}/api/map/${userId}`)
     .then(res =>
     {
         console.log("res from getUserRooms:", res)
@@ -77,7 +81,7 @@ export const postUserRoom = (userId, room) => dispatch =>
 {
     dispatch({ type: POST_THING_START })
 
-    axiosWithAuth().post(`${baseURL}/api/map/${userId}`, room)
+    axaBE().post(`${baseURL}/api/map/${userId}`, room)
     .then(res =>
     {
         console.log("res from postUserRoom:", res)
@@ -88,4 +92,37 @@ export const postUserRoom = (userId, room) => dispatch =>
         console.log("err from postUserRoom:", err)
         dispatch({ type: POST_THING_FAIL, payload: err })
     })
+}
+
+export const postMove = (direction, next=null) => dispatch =>
+{
+    dispatch({ type: POST_MOVE_START })
+    if(next !== null)
+    {
+        axiosWithAuth().post(`${lambdaURL}/adv/move`, {'direction': direction, 'next_room_id': next})
+        .then(res =>
+        {
+            console.log("res from postMove:", res)
+            dispatch({ type: POST_MOVE_SUCCESS, payload: res })
+        })
+        .catch(err =>
+        {
+            console.log("err from postMove:", err)
+            dispatch({ type: POST_MOVE_FAIL, payload: err })
+        })
+    }
+    else
+    {
+        axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction})
+        .then(res =>
+        {
+            console.log("res from postMove:", res)
+            dispatch({ type: POST_MOVE_SUCCESS, payload: res })
+        })
+        .catch(err =>
+        {
+            console.log("err from postMove:", err)
+            dispatch({ type: POST_MOVE_FAIL, payload: err })
+        })
+    }
 }
