@@ -19,6 +19,9 @@ export const TRAVEL_DIRECTION_FAIL = "TRAVEL_DIRECTION_FAIL"
 export const PRAY_START = "PRAY_START"
 export const PRAY_SUCCESS = "PRAY_SUCCESS"
 export const PRAY_FAIL = "PRAY_FAIL"
+export const GET_INIT_START = "GET_INIT_START"
+export const GET_INIT_SUCCESS = "GET_INIT_SUCCESS"
+export const GET_INIT_FAIL = "GET_INIT_FAIL"
 
 
 
@@ -128,4 +131,21 @@ export const postMove = (direction, next=null) => dispatch =>
             dispatch({ type: TRAVEL_DIRECTION_FAIL, payload: err })
         })
     }
+}
+
+export const getInit = _ => dispatch =>
+{
+    dispatch({ type: GET_INIT_START })
+
+    axiosWithAuth().get(`${lambdaURL}/adv/init`)
+    .then(res =>
+    {
+        console.log("res from getInit:", res)
+        dispatch({ type: GET_INIT_SUCCESS, payload: res })
+    })
+    .catch(err =>
+    {
+        console.log("err from getInit:", err)
+        dispatch({ type: GET_INIT_FAIL, payload: err })
+    })
 }

@@ -1,20 +1,19 @@
-import { move } from '../store/actions'
+import { postMove } from '../store/actions'
 
-class Graph
+export class Graph
 {
     constructor()
     {
         this.rooms = []
     }
-    moveDir(dir, next=null)
+    moveDir(dir, next=null, cb)
     {
-        move(dir, next)
-        
+        cb(dir, next)
     }
 }
 
 
-class Player
+export class Player
 {
     constructor()
     {

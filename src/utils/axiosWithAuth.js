@@ -1,8 +1,8 @@
 import axios from 'axios'
+
 export const axiosWithAuth = () =>
 {
-    const key = `Bearer ${process.env.API_KEY}`
-
+    const key = `Token ${process.env.REACT_APP_API_KEY}`
     return axios.create({
         headers:
         {
