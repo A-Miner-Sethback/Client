@@ -29,7 +29,7 @@ const baseURL = `https://backendtreasure.herokuapp.com`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
 
-export const postRegistration = user => dispatch =>
+export const postRegistration = (user, history) => dispatch =>
 {
     dispatch({ type: REGISTER_USER_START })
 
@@ -39,6 +39,7 @@ export const postRegistration = user => dispatch =>
         console.log("res from postRegistration:", res)
         localStorage.setItem('token', res.data.token)
         dispatch({ type: REGISTER_USER_SUCCESS, payload: res })
+        history.push('/')
     })
     .catch(err =>
     {
@@ -109,8 +110,11 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         .then(res =>
         {
             console.log("res from postMove:", res)
-            dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: res })
-            axaBE().post(`${baseURL}/api/map/${userId}/travel`, curRoom, prevRoom, direction)
+            axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
+            .then(resp =>
+            {
+                dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+            })
         })
         .catch(err =>
         {
@@ -146,9 +150,11 @@ export const getInit = userId => dispatch =>
         axaBE().get(`${baseURL}/api/map/${userId}`)
         .then(response =>
         {
+            console.log('a', response)
             let roomIds = response.data.map(el => el.id)
             if(roomIds.includes(room.id))
             {
+                console.log('room already in db')
                 dispatch({type: INIT_ROOM_EXISTS, payload: response})
             }
             else
@@ -156,6 +162,7 @@ export const getInit = userId => dispatch =>
                 axaBE().post(`${baseURL}/api/map/${userId}`, room)
                 .then(resp3 =>
                 {
+                    console.log('resp3', resp3)
                     dispatch({ type: GET_INIT_SUCCESS, payload: resp3 })
                 })
                 .catch(err =>
