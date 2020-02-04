@@ -63,11 +63,11 @@ const Home = _ =>
                             <button className='direction button is-info' onClick={() => handleMove('n')}>N</button>
                         </div>
                         <div className='middle'>
-                            <button className='direction button is-info' onClick={() => handleMove('s')}>E</button>
-                            <button className='direction button is-info' onClick={() => handleMove('e')}>W</button>
+                            <button className='direction button is-info' onClick={() => handleMove('w')}>W</button>
+                            <button className='direction button is-info' onClick={() => handleMove('e')}>E</button>
                         </div>
                         <div className='bottom'>
-                            <button className='direction button is-info' onClick={() => handleMove('w')}>S</button>
+                            <button className='direction button is-info' onClick={() => handleMove('s')}>S</button>
                         </div>
                     </div>
                 </Controls>

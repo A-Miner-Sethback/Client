@@ -113,6 +113,7 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
             axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
             .then(resp =>
             {
+                console.log('resp in postmove', resp)
                 dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
             })
         })
@@ -128,7 +129,12 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         .then(res =>
         {
             console.log("res from postMove:", res)
-            dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: res })
+            axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
+            .then(resp =>
+            {
+                console.log('resp in postmove', resp)
+                dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+            })
         })
         .catch(err =>
         {
