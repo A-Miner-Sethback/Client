@@ -18,6 +18,10 @@ import
     PRAY_START,
     PRAY_SUCCESS,
     PRAY_FAIL,
+    GET_INIT_START,
+    GET_INIT_SUCCESS,
+    GET_INIT_FAIL,
+    INIT_ROOM_EXISTS,
 } from './actions'
 
 
@@ -25,7 +29,9 @@ const initialState =
 {
     userId: "",
     isLoading: false,
-
+    rooms: [],
+    prevRoom: {},
+    curRoom: {},
 }
 
 export const reducer = (state = initialState, action) =>
@@ -42,7 +48,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                userId = res.data.userId,
+                userId: action.payload.data.userId,
                 error: "",
             }
         case REGISTER_USER_FAIL:
@@ -61,7 +67,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                userId = res.data.userId,
+                userId: action.payload.data.userId,
                 error: "",
             }
         case LOGIN_USER_FAIL:
@@ -80,7 +86,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                rooms = res.data.rooms, //TODO: check this
+                rooms: action.payload.data.rooms, //TODO: check this
                 error: "",
             }
         case GET_USER_ROOMS_FAIL:
@@ -118,7 +124,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                rooms: [...state.rooms, action.payload],
+                rooms: action.payload.data,
                 error: "",
             }
         case TRAVEL_DIRECTION_FAIL:
@@ -145,6 +151,34 @@ export const reducer = (state = initialState, action) =>
                 ...state,
                 isLoading: false,
                 error: action.payload,
+            }
+        case GET_INIT_START:
+            return {
+                ...state,
+                isLoading: true,
+                error: "",
+            }
+        case GET_INIT_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload.data,
+                rooms: [...state.rooms, action.payload.data],
+                error: "",
+            }
+        case GET_INIT_FAIL:
+            return {
+                ...state,
+                isLoading: false,
+                error: action.payload,
+            }
+        case INIT_ROOM_EXISTS:
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload.data,
+                rooms: [...state.rooms, action.payload.data],
+                error: "",
             }
         default:
             return state
