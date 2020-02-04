@@ -20,6 +20,8 @@ export const PRAY_START = "PRAY_START"
 export const PRAY_SUCCESS = "PRAY_SUCCESS"
 export const PRAY_FAIL = "PRAY_FAIL"
 
+
+
 const baseURL = `https://backendtreasure.herokuapp.com`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
@@ -86,7 +88,7 @@ export const postUserRoom = (userId, room) => dispatch =>
     .then(res =>
     {
         console.log("res from postUserRoom:", res)
-        dispatch({ type: ADD_USER_ROOM_SUCCESS, payload: res })
+        dispatch({ type: ADD_USER_ROOM_SUCCESS, payload: room })
     })
     .catch(err =>
     {
