@@ -21,6 +21,7 @@ import
     GET_INIT_START,
     GET_INIT_SUCCESS,
     GET_INIT_FAIL,
+    INIT_ROOM_EXISTS,
 } from './actions'
 
 
@@ -29,6 +30,7 @@ const initialState =
     userId: "",
     isLoading: false,
     rooms: [],
+    prevRoom: {},
     curRoom: {},
 }
 
@@ -161,6 +163,7 @@ export const reducer = (state = initialState, action) =>
                 ...state,
                 isLoading: false,
                 curRoom: action.payload.data,
+                rooms: [...state.rooms, action.payload.data],
                 error: "",
             }
         case GET_INIT_FAIL:
@@ -168,6 +171,14 @@ export const reducer = (state = initialState, action) =>
                 ...state,
                 isLoading: false,
                 error: action.payload,
+            }
+        case INIT_ROOM_EXISTS:
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload.data,
+                rooms: [...state.rooms, action.payload.data],
+                error: "",
             }
         default:
             return state

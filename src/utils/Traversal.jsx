@@ -61,7 +61,7 @@ const Traversal = _ =>
             if(r && !visitedSet.has(r.id))
             {
                 visitedSet.add(r.id)
-                state.rooms.exits.n = ?
+                // state.rooms.exits[0] === -1
             }
         }
     }

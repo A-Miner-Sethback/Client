@@ -24,7 +24,7 @@ const Home = _ =>
     const handleInit = e =>
     {
         console.log('ug, manual clg')
-        dispatch(getInit())
+        dispatch(getInit(state.userId))
     }
 
     const handleMove = dir =>

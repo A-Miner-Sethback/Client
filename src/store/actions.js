@@ -22,7 +22,7 @@ export const PRAY_FAIL = "PRAY_FAIL"
 export const GET_INIT_START = "GET_INIT_START"
 export const GET_INIT_SUCCESS = "GET_INIT_SUCCESS"
 export const GET_INIT_FAIL = "GET_INIT_FAIL"
-
+export const INIT_ROOM_EXISTS = "INIT_ROOM_EXISTS"
 
 
 const baseURL = `https://backendtreasure.herokuapp.com`
@@ -100,7 +100,7 @@ export const postUserRoom = (userId, room) => dispatch =>
     })
 }
 
-export const postMove = (direction, next=null) => dispatch =>
+export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dispatch =>
 {
     dispatch({ type: TRAVEL_DIRECTION_START })
     if(next !== null)
@@ -110,6 +110,7 @@ export const postMove = (direction, next=null) => dispatch =>
         {
             console.log("res from postMove:", res)
             dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: res })
+            axaBE().post(`${baseURL}/api/map/${userId}/travel`, curRoom, prevRoom, direction)
         })
         .catch(err =>
         {
@@ -133,7 +134,7 @@ export const postMove = (direction, next=null) => dispatch =>
     }
 }
 
-export const getInit = _ => dispatch =>
+export const getInit = userId => dispatch =>
 {
     dispatch({ type: GET_INIT_START })
 
@@ -141,7 +142,34 @@ export const getInit = _ => dispatch =>
     .then(res =>
     {
         console.log("res from getInit:", res)
-        dispatch({ type: GET_INIT_SUCCESS, payload: res })
+        let room = res.data
+        axaBE().get(`${baseURL}/api/map/${userId}`)
+        .then(response =>
+        {
+            let roomIds = response.data.map(el => el.id)
+            if(roomIds.includes(room.id))
+            {
+                dispatch({type: INIT_ROOM_EXISTS, payload: response})
+            }
+            else
+            {   
+                axaBE().post(`${baseURL}/api/map/${userId}`, room)
+                .then(resp3 =>
+                {
+                    dispatch({ type: GET_INIT_SUCCESS, payload: resp3 })
+                })
+                .catch(err =>
+                {
+                    console.log("err from getInit:", err)
+                    dispatch({ type: GET_INIT_FAIL, payload: err })
+                })
+            }
+        })
+        .catch(err =>
+        {
+            console.log("err from getInit:", err)
+            dispatch({ type: GET_INIT_FAIL, payload: err })
+        })
     })
     .catch(err =>
     {
