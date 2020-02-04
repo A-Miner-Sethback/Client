@@ -42,7 +42,7 @@ export const postRegistration = user => dispatch =>
     })
 }
 
-export const postLogin = user => dispatch =>
+export const postLogin = (user, history) => dispatch =>
 {
     dispatch({ type: LOGIN_USER_START })
 
@@ -52,6 +52,7 @@ export const postLogin = user => dispatch =>
         console.log("res from postLogin:", res)
         localStorage.setItem(res.token)
         dispatch({ type: LOGIN_USER_SUCCESS, payload: res })
+        history.push('/')
     })
     .catch(err =>
     {
@@ -79,36 +80,36 @@ export const getUserRooms = userId => dispatch =>
 
 export const postUserRoom = (userId, room) => dispatch =>
 {
-    dispatch({ type: POST_THING_START })
+    dispatch({ type: ADD_USER_ROOM_START })
 
     axaBE().post(`${baseURL}/api/map/${userId}`, room)
     .then(res =>
     {
         console.log("res from postUserRoom:", res)
-        dispatch({ type: POST_THING_SUCCESS, payload: res })
+        dispatch({ type: ADD_USER_ROOM_SUCCESS, payload: res })
     })
     .catch(err =>
     {
         console.log("err from postUserRoom:", err)
-        dispatch({ type: POST_THING_FAIL, payload: err })
+        dispatch({ type: ADD_USER_ROOM_FAIL, payload: err })
     })
 }
 
 export const postMove = (direction, next=null) => dispatch =>
 {
-    dispatch({ type: POST_MOVE_START })
+    dispatch({ type: TRAVEL_DIRECTION_START })
     if(next !== null)
     {
         axiosWithAuth().post(`${lambdaURL}/adv/move`, {'direction': direction, 'next_room_id': next})
         .then(res =>
         {
             console.log("res from postMove:", res)
-            dispatch({ type: POST_MOVE_SUCCESS, payload: res })
+            dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: res })
         })
         .catch(err =>
         {
             console.log("err from postMove:", err)
-            dispatch({ type: POST_MOVE_FAIL, payload: err })
+            dispatch({ type: TRAVEL_DIRECTION_FAIL, payload: err })
         })
     }
     else
@@ -117,12 +118,12 @@ export const postMove = (direction, next=null) => dispatch =>
         .then(res =>
         {
             console.log("res from postMove:", res)
-            dispatch({ type: POST_MOVE_SUCCESS, payload: res })
+            dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: res })
         })
         .catch(err =>
         {
             console.log("err from postMove:", err)
-            dispatch({ type: POST_MOVE_FAIL, payload: err })
+            dispatch({ type: TRAVEL_DIRECTION_FAIL, payload: err })
         })
     }
 }

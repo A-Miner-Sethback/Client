@@ -1,3 +1,4 @@
+import axios from 'axios'
 export const axiosWithAuth = () =>
 {
     const key = `Bearer ${process.env.API_KEY}`
