@@ -23,9 +23,11 @@ export const GET_INIT_START = "GET_INIT_START"
 export const GET_INIT_SUCCESS = "GET_INIT_SUCCESS"
 export const GET_INIT_FAIL = "GET_INIT_FAIL"
 export const INIT_ROOM_EXISTS = "INIT_ROOM_EXISTS"
+export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM"
 
 
-const baseURL = `https://backendtreasure.herokuapp.com`
+// const baseURL = `https://backendtreasure.herokuapp.com`
+const baseURL = `http://localhost:5000`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
 
@@ -153,6 +155,8 @@ export const getInit = userId => dispatch =>
     {
         console.log("res from getInit:", res)
         let room = res.data
+
+        dispatch({type: SET_CURRENT_ROOM, payload: room})
         axaBE().get(`${baseURL}/api/map/${userId}`)
         .then(response =>
         {
