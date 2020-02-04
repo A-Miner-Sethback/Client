@@ -18,6 +18,9 @@ import
     PRAY_START,
     PRAY_SUCCESS,
     PRAY_FAIL,
+    GET_INIT_START,
+    GET_INIT_SUCCESS,
+    GET_INIT_FAIL,
 } from './actions'
 
 
@@ -25,7 +28,8 @@ const initialState =
 {
     userId: "",
     isLoading: false,
-
+    rooms: [],
+    curRoom: {},
 }
 
 export const reducer = (state = initialState, action) =>
@@ -141,6 +145,25 @@ export const reducer = (state = initialState, action) =>
                 error: "",
             }
         case PRAY_FAIL:
+            return {
+                ...state,
+                isLoading: false,
+                error: action.payload,
+            }
+        case GET_INIT_START:
+            return {
+                ...state,
+                isLoading: true,
+                error: "",
+            }
+        case GET_INIT_SUCCESS:
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload.data,
+                error: "",
+            }
+        case GET_INIT_FAIL:
             return {
                 ...state,
                 isLoading: false,

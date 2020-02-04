@@ -18,8 +18,8 @@ export const MapContainer = styled.div`
     width: 75%;
     display: grid;
     background-color: green;
-    grid-template-columns: repeat(24, 1fr);
-    grid-template-rows: repeat(24, 1fr);
+    grid-template-columns: repeat(100, 1fr);
+    grid-template-rows: repeat(100, 1fr);
 `;
 
 export const RoomDescription = styled.div`
@@ -39,4 +39,40 @@ export const Controls = styled.div`
     background-color: red;
     width: 100%;
     height: 50%;
+
+    .directions {
+        margin-top: 15px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+
+        .top {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            .button {
+                width: 20%;
+            }
+        }
+
+        .middle {
+            display: flex;
+            justify-content: space-evenly;
+            width: 100%;
+            .button {
+                width: 20%
+            }
+        }
+
+        .bottom {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+            .button {
+                width: 20%;
+            }
+        }
+    }
 `;

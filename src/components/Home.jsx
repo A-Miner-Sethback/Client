@@ -23,6 +23,7 @@ const Home = _ =>
 
     const handleInit = e =>
     {
+        console.log('ug, manual clg')
         dispatch(getInit())
     }
 
@@ -30,28 +31,43 @@ const Home = _ =>
     {
         dispatch(postMove(dir))
     }
-
+    console.log(state)
     return (
         <HomePageDiv>
             <MapContainer>
-                a
+                <div className='room room1'>1</div>
+                <div className='room'>2</div>
+                <div className='room'>3</div>
+                <div className='room'>4</div>
+                <div className='room'>5</div>
+                <div className='room'>6</div>
             </MapContainer>
             <div className="room-controls">
                 <RoomDescription>
-                    <p>b</p>
+                    {state && state.curRoom && <>
+                        <p>Title: {state.curRoom.title}</p>
+                        <p>Description: {state.curRoom.description}</p>
+                        <p>Coords: {state.curRoom.coordinates}</p>
+                        <p>Elevation: {state.curRoom.elevation}</p>
+                        <p>Terrain: {state.curRoom.terrain}</p>
+                        {/* <p>players: {state.curRoom.players}</p> */}
+                        {/* <p>Items: {state.curRoom.items}</p> */}
+                        {/* <p>Exits: {state.curRoom.exits.forEach(exit => <p>{exit}</p>)} */}
+                        <p>Cooldown: {state.curRoom.cooldown}</p>
+                    </>}
                 </RoomDescription>
                 <Controls>
-                    <button className="init" onClick={handleInit}>Init</button>
+                    <button className="init button is-info is-fullwidth" onClick={handleInit}>Init</button>
                     <div className='directions'>
                         <div className='top'>
-                            <button className='direction' onClick={() => handleMove('n')}>N</button>
+                            <button className='direction button is-info' onClick={() => handleMove('n')}>N</button>
                         </div>
                         <div className='middle'>
-                            <button className='direction' onClick={() => handleMove('s')}>E</button>
-                            <button className='direction' onClick={() => handleMove('e')}>W</button>
+                            <button className='direction button is-info' onClick={() => handleMove('s')}>E</button>
+                            <button className='direction button is-info' onClick={() => handleMove('e')}>W</button>
                         </div>
                         <div className='bottom'>
-                            <button className='direction' onClick={() => handleMove('w')}>S</button>
+                            <button className='direction button is-info' onClick={() => handleMove('w')}>S</button>
                         </div>
                     </div>
                 </Controls>
