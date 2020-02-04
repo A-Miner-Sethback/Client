@@ -42,7 +42,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                userId = res.data.userId,
+                userId: action.payload.data.userId,
                 error: "",
             }
         case REGISTER_USER_FAIL:
@@ -61,7 +61,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                userId = res.data.userId,
+                userId: action.payload.data.userId,
                 error: "",
             }
         case LOGIN_USER_FAIL:
@@ -80,7 +80,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                rooms = res.data.rooms, //TODO: check this
+                rooms: action.payload.data.rooms, //TODO: check this
                 error: "",
             }
         case GET_USER_ROOMS_FAIL:

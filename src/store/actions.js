@@ -34,7 +34,7 @@ export const postRegistration = user => dispatch =>
     .then(res =>
     {
         console.log("res from postRegistration:", res)
-        localStorage.setItem(res.token)
+        localStorage.setItem('token', res.data.token)
         dispatch({ type: REGISTER_USER_SUCCESS, payload: res })
     })
     .catch(err =>
@@ -52,7 +52,7 @@ export const postLogin = (user, history) => dispatch =>
     .then(res =>
     {
         console.log("res from postLogin:", res)
-        localStorage.setItem(res.token)
+        localStorage.setItem('token', res.data.token)
         dispatch({ type: LOGIN_USER_SUCCESS, payload: res })
         history.push('/')
     })
