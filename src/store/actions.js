@@ -111,7 +111,10 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         axiosWithAuth().post(`${lambdaURL}/adv/move`, {'direction': direction, 'next_room_id': next})
         .then(res =>
         {
+            prevRoom = curRoom
+            curRoom = res.data
             console.log("res from postMove:", res)
+            dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
             axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
             .then(resp =>
             {
@@ -156,7 +159,7 @@ export const getInit = userId => dispatch =>
         console.log("res from getInit:", res)
         let room = res.data
 
-        dispatch({type: SET_CURRENT_ROOM, payload: room})
+        dispatch({type: SET_CURRENT_ROOM, payload: {curRoom: room, prevRoom:room}})
         axaBE().get(`${baseURL}/api/map/${userId}`)
         .then(response =>
         {
