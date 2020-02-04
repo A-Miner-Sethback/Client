@@ -23,13 +23,12 @@ const Home = _ =>
 
     const handleInit = e =>
     {
-        console.log('ug, manual clg')
         dispatch(getInit(state.userId))
     }
 
     const handleMove = dir =>
     {
-        dispatch(postMove(dir))
+        dispatch(postMove(dir, state.userId, state.curRoom, state.prevRoom))
     }
     console.log(state)
     return (

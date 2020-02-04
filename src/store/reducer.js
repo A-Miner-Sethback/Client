@@ -22,6 +22,7 @@ import
     GET_INIT_SUCCESS,
     GET_INIT_FAIL,
     INIT_ROOM_EXISTS,
+    SET_CURRENT_ROOM,
 } from './actions'
 
 
@@ -162,7 +163,6 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                curRoom: action.payload.data,
                 rooms: [...state.rooms, action.payload.data],
                 error: "",
             }
@@ -176,7 +176,15 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                curRoom: action.payload.data,
+                rooms: [...state.rooms, action.payload.data],
+                error: "",
+            }
+        case SET_CURRENT_ROOM:
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload,
+                prevRoom: action.payload,
                 rooms: [...state.rooms, action.payload.data],
                 error: "",
             }
