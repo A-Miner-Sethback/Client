@@ -23,8 +23,4 @@ yarn-debug.log*
 yarn-error.log*
 
 
-<<<<<<< HEAD
 .env
-=======
-.env
->>>>>>> e406e8bff0fd0a2637dc222dbbd1c5e7e9dcecc4
