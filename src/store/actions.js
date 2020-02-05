@@ -24,10 +24,11 @@ export const GET_INIT_SUCCESS = "GET_INIT_SUCCESS"
 export const GET_INIT_FAIL = "GET_INIT_FAIL"
 export const INIT_ROOM_EXISTS = "INIT_ROOM_EXISTS"
 export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM"
+export const DECREMENT_COOLDOWN = "DECREMENT_COOLDOWN"
 
 
-const baseURL = `https://backendtreasure.herokuapp.com`
-// const baseURL = `http://localhost:5000`
+// const baseURL = `https://backendtreasure.herokuapp.com`
+const baseURL = `http://localhost:5000`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
 
@@ -59,6 +60,7 @@ export const postLogin = (user, history) => dispatch =>
     {
         console.log("res from postLogin:", res)
         localStorage.setItem('token', res.data.token)
+        localStorage.setItem('userId', res.data.userId)
         dispatch({ type: LOGIN_USER_SUCCESS, payload: res })
         history.push('/')
     })
@@ -93,7 +95,7 @@ export const postUserRoom = (userId, room) => dispatch =>
     axaBE().post(`${baseURL}/api/map/${userId}`, room)
     .then(res =>
     {
-        console.log("res from postUserRoom:", res)
+        // console.log("res from postUserRoom:", res)
         dispatch({ type: ADD_USER_ROOM_SUCCESS, payload: room })
     })
     .catch(err =>
@@ -113,13 +115,14 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         {
             prevRoom = curRoom
             curRoom = res.data
-            console.log("res from postMove:", res)
+            // console.log("res from postMove:", res)
             dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
             axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
             .then(resp =>
             {
                 console.log('resp in postmove', resp)
                 dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+                return res.data
             })
         })
         .catch(err =>
@@ -142,6 +145,7 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
             {
                 console.log('resp in postmove', resp)
                 dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+                return res.data
             })
         })
         .catch(err =>
@@ -166,11 +170,12 @@ export const getInit = userId => dispatch =>
         axaBE().get(`${baseURL}/api/map/${userId}`)
         .then(response =>
         {
-            console.log('a', response)
+            // console.log('a', response)
             let roomIds = response.data.map(el => el.id)
-            if(roomIds.includes(room.id))
+            // console.log('room ids', roomIds)
+            if(roomIds.includes(room.room_id))
             {
-                console.log('room already in db')
+                // console.log('room already in db')
                 dispatch({type: INIT_ROOM_EXISTS, payload: response})
             }
             else
@@ -178,7 +183,7 @@ export const getInit = userId => dispatch =>
                 axaBE().post(`${baseURL}/api/map/${userId}`, room)
                 .then(resp3 =>
                 {
-                    console.log('resp3', resp3)
+                    // console.log('resp3', resp3)
                     dispatch({ type: GET_INIT_SUCCESS, payload: resp3 })
                 })
                 .catch(err =>
@@ -199,4 +204,20 @@ export const getInit = userId => dispatch =>
         console.log("err from getInit:", err)
         dispatch({ type: GET_INIT_FAIL, payload: err })
     })
+}
+
+export const decrementCD = _ => dispatch =>
+{
+    dispatch({type: DECREMENT_COOLDOWN})
+}
+
+
+export const travCurRoomSet = (curRoom, prevRoom) => dispatch =>
+{
+    dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
+}
+
+export const travSuccess = (stuff) => dispatch =>
+{
+    dispatch({type: TRAVEL_DIRECTION_SUCCESS, payload: stuff})
 }
