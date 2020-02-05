@@ -59,6 +59,7 @@ const Traversal = _ =>
         let curRoom = paramCurRoom
         let prevRoom = curRoom
         let tempRooms
+
         let dftInterval = setInterval(() => {
 
             console.log('s', s)
@@ -93,7 +94,8 @@ const Traversal = _ =>
                         {
                             let dBft = pathToUnwalked.shift()
                             // dispatch(postMove(dBft))
-                            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[0], next_room_id: dBft[1].id})
+                            console.log('dbft[1]', dBft[1])
+                            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[0], next_room_id: `${dBft[1].id}`})
                             .then(res =>
                             {
                                 prevRoom = curRoom
@@ -114,14 +116,12 @@ const Traversal = _ =>
                                     } 
                                     else if(pathToUnwalked.length === 1) 
                                     {
-                                        // console.log('pushing to s')
-                                        // s.push(getUnwalkedNeighbors(tempRooms.filter(el => el.id === curRoom.room_id), tempRooms))
-                                        // console.log('s.length after bft push', s.length)
                                         clearInterval(bftInterval)
                                         dft(tempRooms, curRoom)
                                     }
                                 })
                             })
+                            console.log('curRoom.cooldown from Bft interval', curRoom.cooldown)
                         }, Number(curRoom.cooldown)*1000 + 1000)
 
                     }
@@ -132,6 +132,7 @@ const Traversal = _ =>
                     if(s.length === 0) clearInterval(dftInterval)
                 })
             })
+            console.log('curRoom.cooldown from dft interval', curRoom.cooldown)
         }, Number(curRoom.cooldown)*1000 + 1000)
     }
     
