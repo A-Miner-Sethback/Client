@@ -50,13 +50,15 @@ const Traversal = _ =>
         return shuffleArray(unwalked)
     }
 
-    function dft()
+    function dft(paramTempRooms=state.rooms, paramCurRoom=state.curRoom)
     {
         let s = []
-        let cur = state.rooms.filter(el => el.id === state.curRoom.room_id)
+        let cur = paramTempRooms.filter(el => el.id === paramCurRoom.room_id)
         console.log('cur', cur)
-        s.push(getUnwalkedNeighbors(cur)[0])
-        let curRoom = state.curRoom
+        s.push(getUnwalkedNeighbors(cur, paramTempRooms)[0])
+        let curRoom = paramCurRoom
+        let prevRoom = curRoom
+        let tempRooms
         let dftInterval = setInterval(() => {
 
             console.log('s', s)
@@ -65,9 +67,9 @@ const Traversal = _ =>
             axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: d})
             .then(res =>
             {
-                let prevRoom = state.curRoom
+                prevRoom = curRoom
                 curRoom = res.data
-                let tempRooms
+                
                 dispatch(travCurRoomSet(curRoom, prevRoom))
                 axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: d})
                 .then(resp =>
@@ -94,24 +96,32 @@ const Traversal = _ =>
                             axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft})
                             .then(res =>
                             {
-                                prevRoom = state.curRoom
+                                prevRoom = curRoom
                                 curRoom = res.data
+                                console.log('prevRoom', prevRoom)
+                                console.log('curRoom', curRoom)
                                 dispatch(travCurRoomSet(curRoom, prevRoom))
                                 axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft})
                                 .then(resp =>
                                 {
                                     dispatch(travSuccess(resp))
                                 })
+                                .then(_ =>
+                                {
+                                    if(tempRooms >= 500)
+                                    {
+                                        clearInterval(bftInterval)
+                                    } 
+                                    else if(pathToUnwalked.length === 1) 
+                                    {
+                                        // console.log('pushing to s')
+                                        // s.push(getUnwalkedNeighbors(tempRooms.filter(el => el.id === curRoom.room_id), tempRooms))
+                                        // console.log('s.length after bft push', s.length)
+                                        clearInterval(bftInterval)
+                                        dft(tempRooms, curRoom)
+                                    }
+                                })
                             })
-                            if(state.rooms >= 500)
-                            {
-                                clearInterval(bftInterval)
-                            } 
-                            else if(pathToUnwalked.length === 0) 
-                            {
-                                s.push(curRoom)
-                                clearInterval(bftInterval)
-                            }
                         }, Number(curRoom.cooldown)*1000 + 500)
 
                     }
@@ -122,7 +132,7 @@ const Traversal = _ =>
                     if(s.length === 0) clearInterval(dftInterval)
                 })
             })
-        }, Number(curRoom.cooldown)*1000 + 50)
+        }, Number(curRoom.cooldown)*1000 + 500)
     }
     
     function getDir(room_1, room_2, rooms=state.rooms)
@@ -198,8 +208,8 @@ const Traversal = _ =>
                     for(let i=1; i<path.length; i++)
                     {
                         dirPath.push(getDir(path[i-1], path[i], tempRooms))
-                        dirPath.push(getUnwalkedNeighbors([r], tempRooms)[0])
                     }
+                    dirPath.push(getUnwalkedNeighbors([r], tempRooms)[0])
                     console.log('dirPath', dirPath)
                     console.log('aaaaa')
                     return dirPath
