@@ -11,12 +11,35 @@ const Traversal = _ =>
     function doNothing(){}
     function timeoutCD()
     {
-        setTimeout(doNothing, state.cooldown*1000 + 50)
+        setTimeout(doNothing, state.curRoom.cooldown*1000 + 50)
+    }
+
+    function shuffleArray(arr)
+    {
+        let arrCopy = [...arr]
+        let retArr = []
+        while(arrCopy.length > 0)
+        {
+            let a = arrCopy.splice(Math.floor(Math.random()*arrCopy.length), 1)
+            retArr.push(a[0])
+        }
+
+        return retArr
     }
 
     function getUnwalkedNeighbors(room)
     {
+        let stateRoom = state.rooms.filter(el => el.id === room.room_id)
+        let unwalked = []
+        ['n', 'e', 's', 'w'].forEach(el =>
+        {
+            if(stateRoom[`${el}_to`] === -1)
+            {
+                unwalked.push(el)
+            }
+        })
 
+        return shuffleArray(unwalked)
     }
 
     function dft()
@@ -27,27 +50,26 @@ const Traversal = _ =>
         while(s.length > 0)
         {
             timeoutCD()
-            r = s.pop()
+            d = s.pop()
 
-            if(!state.rooms.includes(r[1].id))
+            dispatch(postMove(d))
+            r_next = state.curRoom
+            nextUnwalked = getUnwalkedNeighbors(curRoom)
+            if(nextUnwalked.length > 0)
             {
-                dispatch(postMove(r[0]))
-                r_next = state.curRoom
-                nextUnwalked = getUnwalkedNeighbors(curRoom)
-                if(nextUnwalked.length > 0)
-                {
-                    for(let i=0; i<nextUnwalked.length; i++)
-                    {
-                        s.push(nextUnwalked[i])
-                    }
-                }
-                else if(state.rooms.length < 500)
-                {
-                    bft()
-                }
+                s.push(nextUnwalked[0])
+                // for(let i=0; i<nextUnwalked.length; i++)
+                // {
+                //     s.push(nextUnwalked[i])
+                // }
+            }
+            else if(state.rooms.length < 500)
+            {
+                bft()
             }
         }
     }
+    
 
     function bft()
     {

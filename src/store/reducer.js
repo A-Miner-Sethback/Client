@@ -33,6 +33,7 @@ const initialState =
     rooms: [],
     prevRoom: {},
     curRoom: {},
+    cooldown: 15
 }
 
 export const reducer = (state = initialState, action) =>
@@ -157,6 +158,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: true,
+                userId: localStorage.getItem('userId') || "",
                 error: "",
             }
         case GET_INIT_SUCCESS:

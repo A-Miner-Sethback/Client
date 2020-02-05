@@ -26,8 +26,8 @@ export const INIT_ROOM_EXISTS = "INIT_ROOM_EXISTS"
 export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM"
 
 
-const baseURL = `https://backendtreasure.herokuapp.com`
-// const baseURL = `http://localhost:5000`
+// const baseURL = `https://backendtreasure.herokuapp.com`
+const baseURL = `http://localhost:5000`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
 
@@ -59,6 +59,7 @@ export const postLogin = (user, history) => dispatch =>
     {
         console.log("res from postLogin:", res)
         localStorage.setItem('token', res.data.token)
+        localStorage.setItem('userId', res.data.userId)
         dispatch({ type: LOGIN_USER_SUCCESS, payload: res })
         history.push('/')
     })
@@ -168,7 +169,8 @@ export const getInit = userId => dispatch =>
         {
             console.log('a', response)
             let roomIds = response.data.map(el => el.id)
-            if(roomIds.includes(room.id))
+            console.log('room ids', roomIds)
+            if(roomIds.includes(room.room_id))
             {
                 console.log('room already in db')
                 dispatch({type: INIT_ROOM_EXISTS, payload: response})
