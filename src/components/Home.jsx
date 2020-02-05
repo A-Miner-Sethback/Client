@@ -1,8 +1,9 @@
-import React from "react"
+import React, {useEffect, useState} from "react"
 import { Link } from 'react-router-dom'
 import {useSelector, useDispatch} from "react-redux"
-import {postMove, getInit} from "../store/actions"
+import {postMove, getInit, decrementCD} from "../store/actions"
 import { HomePageDiv, MapContainer, RoomDescription, Controls, RoomDiv, CurRoomDiv, ExitDiv } from './Styles'
+import Traversal from '../utils/Traversal'
 
 const Home = _ =>
 {
@@ -21,6 +22,40 @@ const Home = _ =>
         }
     }
 
+
+    // const [cd, setCD] = useState(state.cooldown)
+
+    // const countDown = _ =>
+    // {
+    //     let cdInterval = setInterval(_ =>
+    //     {
+    //         handleInterval()
+    //     }, 1000)
+
+    //     function handleInterval()
+    //     {
+    //         console.log(cd)
+    //         if(cd <= 0)
+    //         {
+    //             console.log('should clear')
+    //             clearInterval(cdInterval)
+    //         }
+    //         else
+    //         {
+    //             console.log('cd', state.cooldown)
+    //             dispatch(decrementCD())
+    //             setCD(cd - 1)
+    //         }
+    //     }
+        
+    // }
+
+    // useEffect(_ =>
+    // {
+    //     console.log('a')
+    //     setCD(state.cooldown)
+    //     countDown()
+    // }, [state.curId])
 
     const handleInit = e =>
     {
@@ -41,7 +76,7 @@ const Home = _ =>
                 <div className='room'>4</div>
                 <div className='room'>5</div>
                 <div className='room'>6</div> */}
-                {state.rooms.map(room =>
+                {state.rooms && state.rooms.map(room =>
                 {
                     if(room)
                     {
@@ -83,7 +118,7 @@ const Home = _ =>
                         {/* <p>players: {state.curRoom.players}</p> */}
                         {/* <p>Items: {state.curRoom.items}</p> */}
                         {/* <p>Exits: {state.curRoom.exits.forEach(exit => <p>{exit}</p>)} */}
-                        <p>Cooldown: {state.curRoom.cooldown}</p>
+                        <p>Cooldown: {state.cooldown}</p>
                     </>}
                 </RoomDescription>
                 <Controls>
@@ -101,6 +136,7 @@ const Home = _ =>
                         </div>
                     </div>
                     <Link to="/login"><button>Login</button></Link>
+                    <Traversal />
                 </Controls>
             </div>
         </HomePageDiv>
