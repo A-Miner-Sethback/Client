@@ -180,11 +180,13 @@ export const reducer = (state = initialState, action) =>
                 error: "",
             }
         case SET_CURRENT_ROOM:
+            console.log('red cur', action.payload.curRoom)
+            console.log('red prev', action.payload.prevRoom)
             return {
                 ...state,
                 isLoading: false,
-                curRoom: action.payload,
-                prevRoom: action.payload,
+                curRoom: action.payload.curRoom,
+                prevRoom: action.payload.prevRoom,
                 rooms: [...state.rooms, action.payload.data],
                 error: "",
             }

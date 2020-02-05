@@ -26,8 +26,8 @@ export const INIT_ROOM_EXISTS = "INIT_ROOM_EXISTS"
 export const SET_CURRENT_ROOM = "SET_CURRENT_ROOM"
 
 
-// const baseURL = `https://backendtreasure.herokuapp.com`
-const baseURL = `http://localhost:5000`
+const baseURL = `https://backendtreasure.herokuapp.com`
+// const baseURL = `http://localhost:5000`
 
 const lambdaURL = `https://lambda-treasure-hunt.herokuapp.com/api`
 
@@ -133,7 +133,10 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction})
         .then(res =>
         {
+            prevRoom = curRoom
+            curRoom = res.data
             console.log("res from postMove:", res)
+            dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
             axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
             .then(resp =>
             {
