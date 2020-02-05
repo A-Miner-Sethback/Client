@@ -93,7 +93,7 @@ const Traversal = _ =>
                         {
                             let dBft = pathToUnwalked.shift()
                             // dispatch(postMove(dBft))
-                            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft})
+                            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[0], next_room_id: dBft[1].id})
                             .then(res =>
                             {
                                 prevRoom = curRoom
@@ -101,7 +101,7 @@ const Traversal = _ =>
                                 console.log('prevRoom', prevRoom)
                                 console.log('curRoom', curRoom)
                                 dispatch(travCurRoomSet(curRoom, prevRoom))
-                                axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft})
+                                axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
                                 .then(resp =>
                                 {
                                     dispatch(travSuccess(resp))
@@ -122,7 +122,7 @@ const Traversal = _ =>
                                     }
                                 })
                             })
-                        }, Number(curRoom.cooldown)*1000 + 500)
+                        }, Number(curRoom.cooldown)*1000 + 1000)
 
                     }
                 })
@@ -132,7 +132,7 @@ const Traversal = _ =>
                     if(s.length === 0) clearInterval(dftInterval)
                 })
             })
-        }, Number(curRoom.cooldown)*1000 + 500)
+        }, Number(curRoom.cooldown)*1000 + 1000)
     }
     
     function getDir(room_1, room_2, rooms=state.rooms)
@@ -207,9 +207,9 @@ const Traversal = _ =>
                     let dirPath = []
                     for(let i=1; i<path.length; i++)
                     {
-                        dirPath.push(getDir(path[i-1], path[i], tempRooms))
+                        dirPath.push([getDir(path[i-1], path[i], tempRooms), path[i]])
                     }
-                    dirPath.push(getUnwalkedNeighbors([r], tempRooms)[0])
+                    dirPath.push([getUnwalkedNeighbors([r], tempRooms)[0], r])
                     console.log('dirPath', dirPath)
                     console.log('aaaaa')
                     return dirPath
