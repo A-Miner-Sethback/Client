@@ -56,10 +56,10 @@ const Traversal = _ =>
         console.log('cur', cur)
         s.push(getUnwalkedNeighbors(cur)[0])
 
-        let dftInterval = setInterval(async () => {
+        let dftInterval = setInterval(() => {
 
-            if(s.length === 0) clearInterval(dftInterval)
-
+            
+            console.log('s', s)
             let d = s.pop()
             
             axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: d})
@@ -81,7 +81,7 @@ const Traversal = _ =>
                     if(nextUnwalked.length > 0)
                     {
                         s.push(nextUnwalked[0])
-                        console.log('s', s)
+                        console.log('s after pushing nextUnwalked', s)
                         // for(let i=0; i<nextUnwalked.length; i++)
                         // {
                         //     s.push(nextUnwalked[i])
@@ -97,6 +97,11 @@ const Traversal = _ =>
                         //     dispatch(postMove(dBft))
                         // }
                     }
+                })
+                .then(_ =>
+                {
+                    console.log('s.length right before clearInterval', s.length)
+                    if(s.length === 0) clearInterval(dftInterval)
                 })
             })
         }, Number(state.curRoom.cooldown)*1000 + 50)
