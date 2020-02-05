@@ -23,6 +23,7 @@ import
     GET_INIT_FAIL,
     INIT_ROOM_EXISTS,
     SET_CURRENT_ROOM,
+    DECREMENT_COOLDOWN,
 } from './actions'
 
 
@@ -33,6 +34,8 @@ const initialState =
     rooms: [],
     prevRoom: {},
     curRoom: {},
+    cooldown: 0,
+    curId: ''
 }
 
 export const reducer = (state = initialState, action) =>
@@ -126,6 +129,7 @@ export const reducer = (state = initialState, action) =>
                 ...state,
                 isLoading: false,
                 rooms: action.payload.data,
+                curId: state.curRoom.room_id,
                 error: "",
             }
         case TRAVEL_DIRECTION_FAIL:
@@ -157,6 +161,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: true,
+                userId: localStorage.getItem('userId') || "",
                 error: "",
             }
         case GET_INIT_SUCCESS:
@@ -180,14 +185,22 @@ export const reducer = (state = initialState, action) =>
                 error: "",
             }
         case SET_CURRENT_ROOM:
-            console.log('red cur', action.payload.curRoom)
-            console.log('red prev', action.payload.prevRoom)
+            // console.log('red cur', action.payload.curRoom)
+            // console.log('red prev', action.payload.prevRoom)
             return {
                 ...state,
                 isLoading: false,
                 curRoom: action.payload.curRoom,
                 prevRoom: action.payload.prevRoom,
+                cooldown: action.payload.curRoom.cooldown,
                 rooms: [...state.rooms, action.payload.data],
+                error: "",
+            }
+        case DECREMENT_COOLDOWN:
+            return {
+                ...state,
+                isLoading: false,
+                cooldown: Math.max(Number(state.cooldown) - 1, 0),
                 error: "",
             }
         default:

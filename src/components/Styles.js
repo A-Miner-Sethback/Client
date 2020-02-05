@@ -4,7 +4,7 @@ export const HomePageDiv = styled.div`
     display: flex;
     margin: auto;
     margin-top: 50px;
-    height: 1000px;
+    height: 1200px;
     width: 90%;
 
     .room-controls {
@@ -18,8 +18,9 @@ export const MapContainer = styled.div`
     width: 75%;
     display: grid;
     background-color: green;
-    grid-template-columns: repeat(100, 1fr);
-    grid-template-rows: repeat(100, 1fr);
+    overflow: scroll;
+    grid-template-columns: repeat(80, 1fr);
+    grid-template-rows: repeat(80, 1fr);
 `;
 
 export const RoomDescription = styled.div`
@@ -36,7 +37,7 @@ export const RoomDescription = styled.div`
 `;
 
 export const Controls = styled.div`
-    background-color: red;
+    background-color: maroon;
     width: 100%;
     height: 50%;
 
@@ -75,4 +76,37 @@ export const Controls = styled.div`
             }
         }
     }
+`;
+
+export const RoomDiv = styled.div`
+    grid-column-start: ${props => props.xCoord};
+    grid-row-start: ${props => props.yCoord};
+    height: 16px;
+    width: 16px;
+    font-size: 8px;
+    border: 1px solid black;
+    background-color: yellow;
+    /* .cur-room{
+        border-color: red;
+    } */
+`;
+
+export const CurRoomDiv = styled.div`
+    grid-column-start: ${props => props.xCoord};
+    grid-row-start: ${props => props.yCoord};
+    height: 16px;
+    width: 16px;
+    font-size: 10px;
+    border: 2px solid red;
+    background-color: yellow;
+`;
+
+export const ExitDiv = styled.div`
+    position: relative;
+    top: ${props => props.y};
+    left: ${props => props.x};
+    border-radius: 100%;
+    width: 3px;
+    height: 3px;
+    background-color: blue;
 `;
