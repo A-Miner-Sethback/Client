@@ -17,7 +17,7 @@ export const HomePageDiv = styled.div`
 export const MapContainer = styled.div`
     width: 75%;
     display: grid;
-    background-color: green;
+    background-color: gray;
     overflow: scroll;
     grid-template-columns: repeat(80, 1fr);
     grid-template-rows: repeat(80, 1fr);
@@ -80,11 +80,15 @@ export const Controls = styled.div`
 
 export const RoomDiv = styled.div`
     grid-column-start: ${props => props.xCoord};
-    grid-row-start: ${props => props.yCoord};
+    grid-row-start: ${props => 80 - props.yCoord};
     height: 16px;
     width: 16px;
     font-size: 8px;
-    border: 1px solid black;
+    border: 1px solid;
+    border-top-color: ${props => props.borderTop};
+    border-right-color: ${props => props.borderRight};
+    border-bottom-color: ${props => props.borderBottom};
+    border-left-color: ${props => props.borderLeft};
     background-color: yellow;
     /* .cur-room{
         border-color: red;
@@ -93,7 +97,7 @@ export const RoomDiv = styled.div`
 
 export const CurRoomDiv = styled.div`
     grid-column-start: ${props => props.xCoord};
-    grid-row-start: ${props => props.yCoord};
+    grid-row-start: ${props => 80 - props.yCoord};
     height: 16px;
     width: 16px;
     font-size: 10px;

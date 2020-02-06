@@ -113,17 +113,28 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         axiosWithAuth().post(`${lambdaURL}/adv/move`, {'direction': direction, 'next_room_id': next})
         .then(res =>
         {
-            prevRoom = curRoom
-            curRoom = res.data
-            // console.log("res from postMove:", res)
-            dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
-            axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
-            .then(resp =>
+            console.log("res from postMove:", res)
+            if(curRoom.room_id !== res.data.room_id)
             {
-                console.log('resp in postmove', resp)
-                dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
-                return res.data
-            })
+                prevRoom = curRoom
+                curRoom = res.data
+                dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
+                axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
+                .then(resp =>
+                {
+                    console.log('resp in postmove', resp)
+                    dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+                    return res.data
+                })
+            }
+            let cd = res.data.cooldown
+            let timeOut = setInterval(_ =>
+            {
+                cd -= 1
+                if(cd <=0) clearInterval(timeOut)
+                // console.log('cd', cd)
+                dispatch({type: DECREMENT_COOLDOWN})
+            }, 1000)
         })
         .catch(err =>
         {
@@ -136,17 +147,28 @@ export const postMove = (direction, userId, curRoom, prevRoom, next=null) => dis
         axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction})
         .then(res =>
         {
-            prevRoom = curRoom
-            curRoom = res.data
             console.log("res from postMove:", res)
-            dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
-            axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
-            .then(resp =>
+            if(curRoom.room_id !== res.data.room_id)
             {
-                console.log('resp in postmove', resp)
-                dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
-                return res.data
-            })
+                prevRoom = curRoom
+                curRoom = res.data
+                dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
+                axaBE().post(`${baseURL}/api/map/${userId}/travel`, {curRoom, prevRoom, direction})
+                .then(resp =>
+                {
+                    console.log('resp in postmove', resp)
+                    dispatch({ type: TRAVEL_DIRECTION_SUCCESS, payload: resp })
+                    return res.data
+                })
+            }
+            let cd = res.data.cooldown
+            let timeOut = setInterval(_ =>
+            {
+                cd -= 1
+                if(cd <=0) clearInterval(timeOut)
+                // console.log('cd', cd)
+                dispatch({type: DECREMENT_COOLDOWN})
+            }, 1000)
         })
         .catch(err =>
         {
@@ -220,4 +242,58 @@ export const travCurRoomSet = (curRoom, prevRoom) => dispatch =>
 export const travSuccess = (stuff) => dispatch =>
 {
     dispatch({type: TRAVEL_DIRECTION_SUCCESS, payload: stuff})
+}
+
+
+export const pickup = entry => dispatch =>
+{
+    axiosWithAuth().post(`${lambdaURL}/adv/take`, {'name': entry})
+    .then(res =>
+    {
+        console.log('res from pickup', res)
+    })
+    .catch(err =>
+    {
+        console.log('err from pickup', err)
+    })
+}
+
+export const sell = entry => dispatch =>
+{
+    axiosWithAuth().post(`${lambdaURL}/adv/sell`, {'name': entry})
+    .then(res =>
+    {
+        console.log('res from sell', res)
+    })
+    .catch(err =>
+    {
+        console.log('err from sell', err)
+    })
+}
+
+export const confirmSell = entry => dispatch =>
+{
+    axiosWithAuth().post(`${lambdaURL}/adv/sell`, {'name': entry, 'confirm': 'yes'})
+    .then(res =>
+    {
+        console.log('res from confirm sell', res)
+    })
+    .catch(err =>
+    {
+        console.log('err from confirm sell', err)
+    })
+}
+
+
+export const status = status => dispatch =>
+{
+    axiosWithAuth().post(`${lambdaURL}/adv/status`)
+    .then(res =>
+    {
+        console.log('res from status', res)
+    })
+    .catch(err =>
+    {
+        console.log('err from status', err)
+    })
 }

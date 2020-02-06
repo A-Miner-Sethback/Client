@@ -113,10 +113,12 @@ const Traversal = _ =>
                                     if(tempRooms >= 500)
                                     {
                                         clearInterval(bftInterval)
+                                        clearInterval(dftInterval)
                                     } 
                                     else if(pathToUnwalked.length === 1) 
                                     {
                                         clearInterval(bftInterval)
+                                        clearInterval(dftInterval)
                                         dft(tempRooms, curRoom)
                                     }
                                 })

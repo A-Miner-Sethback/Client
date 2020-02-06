@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import { Link } from 'react-router-dom'
 import {useSelector, useDispatch} from "react-redux"
-import {postMove, getInit, decrementCD} from "../store/actions"
+import {postMove, getInit, decrementCD, pickup, sell, confirmSell, status} from "../store/actions"
 import { HomePageDiv, MapContainer, RoomDescription, Controls, RoomDiv, CurRoomDiv, ExitDiv } from './Styles'
 import Traversal from '../utils/Traversal'
 
@@ -22,40 +22,12 @@ const Home = _ =>
         }
     }
 
+    const [entry, setEntry] = useState('')
 
-    // const [cd, setCD] = useState(state.cooldown)
-
-    // const countDown = _ =>
-    // {
-    //     let cdInterval = setInterval(_ =>
-    //     {
-    //         handleInterval()
-    //     }, 1000)
-
-    //     function handleInterval()
-    //     {
-    //         console.log(cd)
-    //         if(cd <= 0)
-    //         {
-    //             console.log('should clear')
-    //             clearInterval(cdInterval)
-    //         }
-    //         else
-    //         {
-    //             console.log('cd', state.cooldown)
-    //             dispatch(decrementCD())
-    //             setCD(cd - 1)
-    //         }
-    //     }
-        
-    // }
-
-    // useEffect(_ =>
-    // {
-    //     console.log('a')
-    //     setCD(state.cooldown)
-    //     countDown()
-    // }, [state.curId])
+    const handleEntry = e =>
+    {
+        setEntry(e.target.value)
+    }
 
     const handleInit = e =>
     {
@@ -64,8 +36,35 @@ const Home = _ =>
 
     const handleMove = dir =>
     {
-        dispatch(postMove(dir, state.userId, state.curRoom, state.prevRoom))
+        if(state.rooms.length > 0)
+        {
+            let stateRoom = state.rooms.filter(el =>
+            {
+                if(el && el.id === state.curRoom.room_id) return true
+                return false
+            })[0]
+            let dirObj = {'n': 'n_to', 'e': 'e_to', 's': 's_to', 'w': 'w_to'}
+            if(stateRoom && stateRoom[dirObj[dir]] > -1)
+            {
+                dispatch(postMove(dir, state.userId, state.curRoom, state.prevRoom, `${stateRoom[dirObj[dir]]}`))
+            }
+            else
+            {
+                dispatch(postMove(dir, state.userId, state.curRoom, state.prevRoom))
+            }
+        }
+        else
+        {
+            dispatch(postMove(dir, state.userId, state.curRoom, state.prevRoom))
+        }
     }
+
+    const handlePickup = _ => dispatch(pickup(entry))
+
+    const handleSell = _ => dispatch(sell(entry))
+    const handleConfirmSell = _ => dispatch(confirmSell(entry))
+
+    const handleStatus = _ => dispatch(status())
     console.log(state)
     return (
         <HomePageDiv>
@@ -85,20 +84,21 @@ const Home = _ =>
                             return (
                                 <CurRoomDiv key={room.id} xCoord={Number(room.x) + 1} yCoord={Number(room.y) + 1}>
                                     {room.id}
-                                    {/* {room.n_to !== -2 && <ExitDiv y={'8x'} x={'4.5px'} />}
-                                    {room.e_to !== -2 && <ExitDiv y={'-12px'} x={'12px'} />}
-                                    {room.s_to !== -2 && <ExitDiv y={'-24px'} x={'4.5px'} />}
-                                    {room.w_to !== -2 && <ExitDiv y={'-12px'} x={'-4.5px'} />} */}
                                 </CurRoomDiv>
                             )
                         }
                         return (
-                            <RoomDiv key={room.id} xCoord={Number(room.x) + 1} yCoord={Number(room.y) + 1}>
+                            <RoomDiv 
+                                key={room.id} 
+                                xCoord={Number(room.x) + 1} 
+                                yCoord={Number(room.y) + 1}
+                                borderTop={room.n_to !== -2 ? 'cyan' : 'black'}
+                                borderRight={room.e_to !== -2 ? 'cyan' : 'black'}
+                                borderBottom={room.s_to !== -2 ? 'cyan' : 'black'}
+                                borderLeft={room.w_to !== -2 ? 'cyan' : 'black'}
+                            >
                                 {room.id}
-                                {/* {room.n_to !== -2 && <ExitDiv y={'8x'} x={'4.5px'} />}
-                                {room.e_to !== -2 && <ExitDiv y={'-12px'} x={'12px'} />}
-                                {room.s_to !== -2 && <ExitDiv y={'-24px'} x={'4.5px'} />}
-                                {room.w_to !== -2 && <ExitDiv y={'-12px'} x={'-4.5px'} />} */}
+
                             </RoomDiv>
                         )
                     }
@@ -118,6 +118,7 @@ const Home = _ =>
                         {/* <p>players: {state.curRoom.players}</p> */}
                         {/* <p>Items: {state.curRoom.items}</p> */}
                         {/* <p>Exits: {state.curRoom.exits.forEach(exit => <p>{exit}</p>)} */}
+                        <p>Items: {state.curRoom.items}</p>
                         <p>Cooldown: {state.cooldown}</p>
                     </>}
                 </RoomDescription>
@@ -136,7 +137,12 @@ const Home = _ =>
                         </div>
                     </div>
                     <Link to="/login"><button>Login</button></Link>
-                    <Traversal />
+                    <input type="text" name="entry" value={entry} onChange={handleEntry}/>
+                    <button onClick={handlePickup}>Pickup</button>
+                    <button onClick={handleSell}>Sell</button>
+                    <button onClick={handleConfirmSell}>Confirm Sell</button>
+                    <button onClick={handleStatus}>Status</button>
+                    {/* <Traversal /> */}
                 </Controls>
             </div>
         </HomePageDiv>
