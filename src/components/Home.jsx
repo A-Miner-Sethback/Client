@@ -172,7 +172,7 @@ const Home = _ =>
                     <button onClick={handleDash} value="e_to">Dash E</button>
                     <button onClick={handleDash} value="s_to">Dash S</button>
                     <button onClick={handleDash} value="w_to">Dash W</button>
-                    {/* <button onClick={handleMine} >Mine</button> */}
+                    <button onClick={handleMine} >Mine</button>
                     <Traversal />
                 </Controls>
             </div>

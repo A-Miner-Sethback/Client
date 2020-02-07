@@ -241,6 +241,11 @@ export const travCurRoomSet = (curRoom, prevRoom) => dispatch =>
     dispatch({type: SET_CURRENT_ROOM, payload: {curRoom, prevRoom}})
 }
 
+export const travCurRoomSetAfterDash = (curRoom, prevRoom) => dispatch =>
+{
+    dispatch({type: SET_CURRENT_ROOM_AFTER_DASH, payload: {curRoom, prevRoom}})
+}
+
 export const travSuccess = (stuff) => dispatch =>
 {
     dispatch({type: TRAVEL_DIRECTION_SUCCESS, payload: stuff})
@@ -373,12 +378,15 @@ function sleep(ms)
 
 export const mine = () => dispatch =>
 {
+    let userId = localStorage.getItem('userId')
     axiosWithAuth().get(`${lambdaURL}/bc/last_proof`)
     .then(async res =>
     {
         console.log('res from last_proof', res)
+        let last_proof = res.data.proof
+        let difficulty = res.data.difficulty
         await sleep(res.data.cooldown)
-        let proof = await mineFunc(res.data.last_proof, res.data.difficulty)
+        let proof = await axaBE().post(`${baseURL}/api/map/${userId}/mine`, {last_proof, difficulty})
         axiosWithAuth().post(`${lambdaURL}/bc/mine`, {proof})
         .then(result =>
         {

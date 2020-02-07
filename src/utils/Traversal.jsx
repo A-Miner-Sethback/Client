@@ -1,6 +1,6 @@
 import React, {useState} from "react"
 import {useSelector, useDispatch} from "react-redux"
-import {postMove, travCurRoomSet, travSuccess} from "../store/actions"
+import {postMove, travCurRoomSet, travCurRoomSetAfterDash, travSuccess} from "../store/actions"
 import { axiosWithAuth, axaBE } from './axiosWithAuth'
 
 const Traversal = _ =>
@@ -16,6 +16,8 @@ const Traversal = _ =>
 
 
     const [stopTraversal, setStopTraversal] = useState(false)
+    
+    const [bftTarget, setBftTarget] = useState('')
 
     function shuffleArray(arr)
     {
@@ -154,14 +156,14 @@ const Traversal = _ =>
 
     function getAnyNeighbors(room, rooms=state.rooms)
     {
-        console.log('room from getAnyNeighbors', room)
-        console.log('rooms from getAnyNeighbors', rooms)
+        // console.log('room from getAnyNeighbors', room)
+        // console.log('rooms from getAnyNeighbors', rooms)
         let stateRoom = rooms.filter(el => 
         {
-            console.log('el', el)
+            // console.log('el', el)
             return el.id === room.id
         })[0]
-        console.log('stateRoom', stateRoom)
+        // console.log('stateRoom', stateRoom)
         
         let nextRooms = []
         let possibleDirs = ['n_to', 'e_to', 's_to', 'w_to']
@@ -169,13 +171,13 @@ const Traversal = _ =>
         {
             if(stateRoom[el] !== -2)
             {
-                console.log('el', el)
+                // console.log('el', el)
                 let nextRoom = rooms.filter(elem => elem.id === stateRoom[el])
-                console.log('nextRoom', nextRoom)
+                // console.log('nextRoom', nextRoom)
                 if(nextRoom.length > 0) nextRooms.push(nextRoom[0])
             }
         })
-        console.log('nextRooms', nextRooms)
+        // console.log('nextRooms', nextRooms)
         return shuffleArray(nextRooms)
     }
 
@@ -187,16 +189,17 @@ const Traversal = _ =>
         let visitedSet = new Set()
         while(q.length > 0)
         {
-            console.log('q', q)
+            // console.log('q', q)
             let path = q.shift()
             let r = path[path.length-1]
-            console.log('r', r)
-            console.log('path', path)
-            console.log('vis', visitedSet)
+            // console.log('r', r)
+            // console.log('path', path)
+            // console.log('vis', visitedSet)
             if(r && !visitedSet.has(r.id))
             {
-                console.log('bbbb')
+                // console.log('bbbb')
                 visitedSet.add(r.id)
+                
                 if(getUnwalkedNeighbors([r], tempRooms).length > 0)
                 {
                     let dirPath = []
@@ -205,19 +208,20 @@ const Traversal = _ =>
                         dirPath.push([getDir(path[i-1], path[i], tempRooms), path[i]])
                     }
                     dirPath.push([getUnwalkedNeighbors([r], tempRooms)[0], r])
+                    
                     console.log('dirPath', dirPath)
-                    console.log('aaaaa')
+                    // console.log('aaaaa')
                     return dirPath
                 }
                 let nextRooms = getAnyNeighbors(r, tempRooms)
-                console.log('nextRooms before for loop', nextRooms)
+                // console.log('nextRooms before for loop', nextRooms)
                 for(let i=0; i<nextRooms.length; i++)
                 {
                     if(!visitedSet.has(nextRooms[i]))
                     {
                         let newPath = [...path]
                         newPath.push(nextRooms[i])
-                        console.log('newPath', newPath)
+                        // console.log('newPath', newPath)
                         q.push(newPath)
                     }
                         
@@ -235,10 +239,146 @@ const Traversal = _ =>
 
     function handleStopTraversal() { setStopTraversal(true)}
 
+
+    function bftToTar(curRoom, tempRooms, target)
+    {
+        let q = []
+        let cur = tempRooms.filter(el => el.id === curRoom.room_id)[0]
+        q.push([cur])
+        let visitedSet = new Set()
+        while(q.length > 0)
+        {
+            let path = q.shift()
+            let r = path[path.length-1]
+            if(r && !visitedSet.has(r.id))
+            {
+                visitedSet.add(r.id)
+                console.log('r.id, target', r.id, target)
+                if(r.id === Number(target))
+                {
+                    let dirPath = []
+                    for(let i=1; i<path.length; i++)
+                    {
+                        dirPath.push([getDir(path[i-1], path[i], tempRooms), path[i]])
+                    }
+                    console.log('dirPath', dirPath)
+                    return dirPath
+                }
+                let nextRooms = getAnyNeighbors(r, tempRooms)
+                for(let i=0; i<nextRooms.length; i++)
+                {
+                    if(!visitedSet.has(nextRooms[i]))
+                    {
+                        let newPath = [...path]
+                        newPath.push(nextRooms[i])
+                        q.push(newPath)
+                    }
+                }
+            }
+        }
+    }
+
+    function dashFind(path)
+    {
+        let retPath = []
+        console.log('path', path)
+        if(path.length < 3)
+        {
+            path.forEach(el =>
+            {
+                let a = el
+                a.unshift('t')
+                retPath.push(a)
+            })
+            return retPath
+        }
+
+        for(let i=0; i<path.length; i++)
+        {
+            let j = i
+            let next_room_ids = []
+            while(j < path.length && path[j][0] === path[i][0])
+            {
+                console.log('j', j)
+                next_room_ids.push(path[j][1].id)
+                j++
+            }
+            if(j >= 3 + i)
+            {
+                console.log('b')
+                let a = [path[i][0]]
+                a.unshift('d')
+                a.push(next_room_ids)
+                retPath.push(a)
+                i = j-1
+            }
+            else
+            {
+                let a = path[i]
+                console.log(a)
+                a.unshift('t')
+                retPath.push(a)
+            }
+        }
+        console.log('retPath', retPath)
+        return retPath
+
+
+    }
+
+    async function bftToRoom(roomId)
+    {
+        let pathToUnwalked = bftToTar(state.curRoom, state.rooms, roomId)
+        pathToUnwalked = dashFind(pathToUnwalked)
+        console.log('a', pathToUnwalked)
+        let curRoom = state.curRoom
+        let prevRoom = curRoom
+        let cd = state.curRoom.cooldown
+        console.log('pathToUnwalked', pathToUnwalked)
+        while(pathToUnwalked.length > 0)
+        {
+            let dBft = pathToUnwalked.shift()
+            // console.log('dbft[0]', dBft[0])
+            // console.log('dbft[1]', dBft[1])
+            await sleep(cd * 1000)
+            let bftRes
+            if(dBft[0] === 't')
+            {
+                bftRes = await axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[1], next_room_id: `${dBft[2].id}`})
+            }
+            else
+            {
+                let dashObj =
+                {
+                    'direction': dBft[1], 
+                    'num_rooms': `${dBft[2].length}`,
+                    'next_room_ids': dBft[2].join(',')
+                }
+                bftRes = await axiosWithAuth().post(`${lambdaURL}/adv/dash`, dashObj)
+            }
+            
+            prevRoom = curRoom
+            curRoom = bftRes.data
+            cd = curRoom.cooldown
+            console.log('prevRoom after bft move', prevRoom)
+            console.log('curRoom after bft move', curRoom)
+            dispatch(travCurRoomSetAfterDash(curRoom, prevRoom))
+            // bftRoomsRes = await axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
+            // console.log('bftRoomsRes', bftRoomsRes)
+            // dispatch(travSuccess(state.rooms))
+        }
+    }
+
+    const handleChange = e => setBftTarget(e.target.value)
+
+    const handleBftToRoom = e => bftToRoom(bftTarget)
+
     return (
         <>
             <button onClick={handleTraverse}>Traverse</button>
             <button onClick={handleStopTraversal}>Stop Traversal</button>
+            <button onClick={handleBftToRoom}>BFT to Room</button>
+            <input type="text" value={bftTarget} onChange={handleChange}/>
         </>
     )
 }
