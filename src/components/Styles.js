@@ -101,8 +101,12 @@ export const CurRoomDiv = styled.div`
     height: 16px;
     width: 16px;
     font-size: 10px;
-    border: 2px solid red;
-    background-color: yellow;
+    border: 2px solid;
+    border-top-color: ${props => props.borderTop};
+    border-right-color: ${props => props.borderRight};
+    border-bottom-color: ${props => props.borderBottom};
+    border-left-color: ${props => props.borderLeft};
+    background-color: red;
 `;
 
 export const ExitDiv = styled.div`

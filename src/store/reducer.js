@@ -129,7 +129,6 @@ export const reducer = (state = initialState, action) =>
                 ...state,
                 isLoading: false,
                 rooms: action.payload.data,
-                curId: state.curRoom.room_id,
                 error: "",
             }
         case TRAVEL_DIRECTION_FAIL:

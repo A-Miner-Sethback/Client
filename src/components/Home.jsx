@@ -82,7 +82,15 @@ const Home = _ =>
                         if(room.id === state.curRoom.room_id)
                         {
                             return (
-                                <CurRoomDiv key={room.id} xCoord={Number(room.x) + 1} yCoord={Number(room.y) + 1}>
+                                <CurRoomDiv 
+                                    key={room.id} 
+                                    xCoord={Number(room.x) + 1} 
+                                    yCoord={Number(room.y) + 1}
+                                    borderTop={room.n_to !== -2 ? 'cyan' : 'black'}
+                                    borderRight={room.e_to !== -2 ? 'cyan' : 'black'}
+                                    borderBottom={room.s_to !== -2 ? 'cyan' : 'black'}
+                                    borderLeft={room.w_to !== -2 ? 'cyan' : 'black'}
+                                >
                                     {room.id}
                                 </CurRoomDiv>
                             )
@@ -142,7 +150,7 @@ const Home = _ =>
                     <button onClick={handleSell}>Sell</button>
                     <button onClick={handleConfirmSell}>Confirm Sell</button>
                     <button onClick={handleStatus}>Status</button>
-                    {/* <Traversal /> */}
+                    <Traversal />
                 </Controls>
             </div>
         </HomePageDiv>

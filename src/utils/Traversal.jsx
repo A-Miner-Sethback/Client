@@ -1,4 +1,4 @@
-import React from "react"
+import React, {useState} from "react"
 import {useSelector, useDispatch} from "react-redux"
 import {postMove, travCurRoomSet, travSuccess} from "../store/actions"
 import { axiosWithAuth, axaBE } from './axiosWithAuth'
@@ -14,11 +14,8 @@ const Traversal = _ =>
     const dispatch = useDispatch()
     const state = useSelector(state => state)
 
-    function doNothing(){}
-    // function timeoutCD(cb)
-    // {
-    //     setTimeout(cb, Number(state.curRoom.cooldown)*1000 + 50)
-    // }
+
+    const [stopTraversal, setStopTraversal] = useState(false)
 
     function shuffleArray(arr)
     {
@@ -50,92 +47,85 @@ const Traversal = _ =>
         return shuffleArray(unwalked)
     }
 
-    function dft(paramTempRooms=state.rooms, paramCurRoom=state.curRoom)
+    function sleep(ms) 
+    {
+        console.log('sleep ran', ms)
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    async function dft(cd=state.curRoom.cd)
     {
         let s = []
-        let cur = paramTempRooms.filter(el => el.id === paramCurRoom.room_id)
+        let cur = state.rooms.filter(el => el.id === state.curRoom.room_id)
         console.log('cur', cur)
-        s.push(getUnwalkedNeighbors(cur, paramTempRooms)[0])
-        let curRoom = paramCurRoom
+
+        
+        let curRoom = state.curRoom
         let prevRoom = curRoom
-        let tempRooms
+        
+        // let noUnwalkedAtCur = false
+        // if(getUnwalkedNeighbors(cur).length > 0)
+        // {
+            s.push(getUnwalkedNeighbors(cur)[0])
+        // }
+        // else noUnwalkedAtCur = true
 
-        let dftInterval = setInterval(() => {
-
-            console.log('s', s)
+        while(s.length > 0 && state.rooms.length < 500 && !stopTraversal)
+        {
+            let roomsRes
+            // if(!noUnwalkedAtCur)
+            // {
             let d = s.pop()
-            
-            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: d})
-            .then(res =>
-            {
-                prevRoom = curRoom
-                curRoom = res.data
-                
-                dispatch(travCurRoomSet(curRoom, prevRoom))
-                axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: d})
-                .then(resp =>
-                {
-                    tempRooms = resp.data
-                    console.log('tempRooms', tempRooms)
-                    dispatch(travSuccess(resp))
-                    let r_next = tempRooms.filter(el => el.id === curRoom.room_id)
-                    console.log('r_next', r_next)
-                    let nextUnwalked = getUnwalkedNeighbors(r_next, tempRooms)
-                    if(nextUnwalked.length > 0)
-                    {
-                        s.push(nextUnwalked[0])
-                        console.log('s after pushing nextUnwalked', s)
-                    }
-                    else if(state.rooms.length < 500)
-                    {
-                        let pathToUnwalked = bft(curRoom, tempRooms)
-                        console.log('pathToUnwalked', pathToUnwalked)
-                        let bftInterval = setInterval(_ =>
-                        {
-                            let dBft = pathToUnwalked.shift()
-                            // dispatch(postMove(dBft))
-                            console.log('dbft[1]', dBft[1])
-                            axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[0], next_room_id: `${dBft[1].id}`})
-                            .then(res =>
-                            {
-                                prevRoom = curRoom
-                                curRoom = res.data
-                                console.log('prevRoom', prevRoom)
-                                console.log('curRoom', curRoom)
-                                dispatch(travCurRoomSet(curRoom, prevRoom))
-                                axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
-                                .then(resp =>
-                                {
-                                    dispatch(travSuccess(resp))
-                                })
-                                .then(_ =>
-                                {
-                                    if(tempRooms >= 500)
-                                    {
-                                        clearInterval(bftInterval)
-                                        clearInterval(dftInterval)
-                                    } 
-                                    else if(pathToUnwalked.length === 1) 
-                                    {
-                                        clearInterval(bftInterval)
-                                        clearInterval(dftInterval)
-                                        dft(tempRooms, curRoom)
-                                    }
-                                })
-                            })
-                            console.log('curRoom.cooldown from Bft interval', curRoom.cooldown)
-                        }, Number(curRoom.cooldown)*1000 + 1000)
 
-                    }
-                })
-                .then(_ =>
+            await sleep(cd * 1000)
+            console.log('after dft sleep')
+            let res = await axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: d})
+
+            prevRoom = curRoom
+            curRoom = res.data
+            cd = res.data.cooldown
+            
+            dispatch(travCurRoomSet(curRoom, prevRoom))
+            roomsRes = await axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: d})
+            console.log('dft roomsRes', roomsRes)
+            dispatch(travSuccess(roomsRes))
+            let r_next = roomsRes.data.filter(el => el.id === curRoom.room_id)
+            let nextUnwalked = getUnwalkedNeighbors(r_next, roomsRes.data)
+            if(nextUnwalked.length > 0)
+            {
+                s.push(nextUnwalked[0])
+                console.log('s after pushing nextUnwalked', s)
+            }
+            // else noUnwalkedAtCur = true
+            // }
+            else if(roomsRes.data.length < 500) //&& noUnwalkedAtCur)
+            {
+                let pathToUnwalked = bft(curRoom, roomsRes.data)
+                console.log('pathToUnwalked', pathToUnwalked)
+                while(pathToUnwalked.length > 1 && state.rooms.length < 500 && !stopTraversal)
                 {
-                    console.log('s.length right before clearInterval', s.length)
-                    if(s.length === 0) clearInterval(dftInterval)
-                })
-            })
-            console.log('curRoom.cooldown from dft interval', curRoom.cooldown)
-        }, Number(curRoom.cooldown)*1000 + 1000)
+                    let dBft = pathToUnwalked.shift()
+                    console.log('dbft[0]', dBft[0])
+                    console.log('dbft[1]', dBft[1])
+                    await sleep(cd * 1000)
+                    let bftRes = await axiosWithAuth().post(`${lambdaURL}/adv/move`, {direction: dBft[0], next_room_id: `${dBft[1].id}`})
+                    
+                    prevRoom = curRoom
+                    curRoom = bftRes.data
+                    cd = curRoom.cooldown
+                    console.log('prevRoom after bft move', prevRoom)
+                    console.log('curRoom after bft move', curRoom)
+                    dispatch(travCurRoomSet(curRoom, prevRoom))
+                    let bftRoomsRes = await axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
+                    console.log('bftRoomsRes', bftRoomsRes)
+                    dispatch(travSuccess(bftRoomsRes))
+                    if(bftRoomsRes.data.length < 500)
+                    {
+                        s.push(pathToUnwalked[0][0])
+                    }
+                }
+            }
+        }
     }
     
     function getDir(room_1, room_2, rooms=state.rooms)
@@ -237,12 +227,16 @@ const Traversal = _ =>
 
     function handleTraverse()
     {
+        setStopTraversal(false)
         dft()
     }
+
+    function handleStopTraversal() { setStopTraversal(true)}
 
     return (
         <>
             <button onClick={handleTraverse}>Traverse</button>
+            <button onClick={handleStopTraversal}>Stop Traversal</button>
         </>
     )
 }
