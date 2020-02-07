@@ -101,6 +101,7 @@ const Traversal = _ =>
             else if(roomsRes.data.length < 500) //&& noUnwalkedAtCur)
             {
                 let pathToUnwalked = bft(curRoom, roomsRes.data)
+                let bftRoomsRes
                 console.log('pathToUnwalked', pathToUnwalked)
                 while(pathToUnwalked.length > 1 && state.rooms.length < 500 && !stopTraversal)
                 {
@@ -116,13 +117,14 @@ const Traversal = _ =>
                     console.log('prevRoom after bft move', prevRoom)
                     console.log('curRoom after bft move', curRoom)
                     dispatch(travCurRoomSet(curRoom, prevRoom))
-                    let bftRoomsRes = await axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
+                    bftRoomsRes = await axaBE().post(`${baseURL}/api/map/${state.userId}/travel`, {curRoom, prevRoom, direction: dBft[0]})
                     console.log('bftRoomsRes', bftRoomsRes)
                     dispatch(travSuccess(bftRoomsRes))
-                    if(bftRoomsRes.data.length < 500)
-                    {
-                        s.push(pathToUnwalked[0][0])
-                    }
+                }
+                if(bftRoomsRes.data.length < 500)
+                {
+                    console.log('pathToUnwalked[0][0]', pathToUnwalked[0][0])
+                    s.push(pathToUnwalked[0][0])
                 }
             }
         }
