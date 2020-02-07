@@ -23,7 +23,9 @@ import
     GET_INIT_FAIL,
     INIT_ROOM_EXISTS,
     SET_CURRENT_ROOM,
+    SET_CURRENT_ROOM_AFTER_DASH,
     DECREMENT_COOLDOWN,
+
 } from './actions'
 
 
@@ -180,7 +182,7 @@ export const reducer = (state = initialState, action) =>
             return {
                 ...state,
                 isLoading: false,
-                rooms: [...state.rooms, action.payload.data],
+                rooms: action.payload.data,
                 error: "",
             }
         case SET_CURRENT_ROOM:
@@ -193,6 +195,17 @@ export const reducer = (state = initialState, action) =>
                 prevRoom: action.payload.prevRoom,
                 cooldown: action.payload.curRoom.cooldown,
                 rooms: [...state.rooms, action.payload.data],
+                error: "",
+            }
+        case SET_CURRENT_ROOM_AFTER_DASH:
+            // console.log('red cur', action.payload.curRoom)
+            // console.log('red prev', action.payload.prevRoom)
+            return {
+                ...state,
+                isLoading: false,
+                curRoom: action.payload.curRoom,
+                prevRoom: action.payload.prevRoom,
+                cooldown: action.payload.curRoom.cooldown,
                 error: "",
             }
         case DECREMENT_COOLDOWN:

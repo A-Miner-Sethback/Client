@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from "react"
 import { Link } from 'react-router-dom'
 import {useSelector, useDispatch} from "react-redux"
-import {postMove, getInit, decrementCD, pickup, sell, confirmSell, status} from "../store/actions"
+import {postMove, getInit, decrementCD, pickup, sell, confirmSell, status, pray, dash, mine} from "../store/actions"
 import { HomePageDiv, MapContainer, RoomDescription, Controls, RoomDiv, CurRoomDiv, ExitDiv } from './Styles'
 import Traversal from '../utils/Traversal'
 
@@ -65,6 +65,22 @@ const Home = _ =>
     const handleConfirmSell = _ => dispatch(confirmSell(entry))
 
     const handleStatus = _ => dispatch(status())
+    const handlePray = _ => dispatch(pray())
+
+    const handleDash = e => 
+    {
+        if(entry === '')
+        {
+            dispatch(dash(state.rooms, state.curRoom, e.target.value))
+        }
+        else
+        {
+            dispatch(dash(state.rooms, state.curRoom, e.target.value, Number(entry)))
+        }
+    }
+
+    const handleMine = () => dispatch(mine())
+
     console.log(state)
     return (
         <HomePageDiv>
@@ -86,10 +102,10 @@ const Home = _ =>
                                     key={room.id} 
                                     xCoord={Number(room.x) + 1} 
                                     yCoord={Number(room.y) + 1}
-                                    borderTop={room.n_to !== -2 ? 'cyan' : 'black'}
-                                    borderRight={room.e_to !== -2 ? 'cyan' : 'black'}
-                                    borderBottom={room.s_to !== -2 ? 'cyan' : 'black'}
-                                    borderLeft={room.w_to !== -2 ? 'cyan' : 'black'}
+                                    borderTop={room.n_to !== -2 ? 'yellow' : 'black'}
+                                    borderRight={room.e_to !== -2 ? 'yellow' : 'black'}
+                                    borderBottom={room.s_to !== -2 ? 'yellow' : 'black'}
+                                    borderLeft={room.w_to !== -2 ? 'yellow' : 'black'}
                                 >
                                     {room.id}
                                 </CurRoomDiv>
@@ -100,10 +116,11 @@ const Home = _ =>
                                 key={room.id} 
                                 xCoord={Number(room.x) + 1} 
                                 yCoord={Number(room.y) + 1}
-                                borderTop={room.n_to !== -2 ? 'cyan' : 'black'}
-                                borderRight={room.e_to !== -2 ? 'cyan' : 'black'}
-                                borderBottom={room.s_to !== -2 ? 'cyan' : 'black'}
-                                borderLeft={room.w_to !== -2 ? 'cyan' : 'black'}
+                                borderTop={room.n_to !== -2 ? 'yellow' : 'black'}
+                                borderRight={room.e_to !== -2 ? 'yellow' : 'black'}
+                                borderBottom={room.s_to !== -2 ? 'yellow' : 'black'}
+                                borderLeft={room.w_to !== -2 ? 'yellow' : 'black'}
+                                roomColor={room.title && room.title.includes('Shrine') ? 'white' : 'yellow'}
                             >
                                 {room.id}
 
@@ -126,7 +143,7 @@ const Home = _ =>
                         {/* <p>players: {state.curRoom.players}</p> */}
                         {/* <p>Items: {state.curRoom.items}</p> */}
                         {/* <p>Exits: {state.curRoom.exits.forEach(exit => <p>{exit}</p>)} */}
-                        <p>Items: {state.curRoom.items}</p>
+                        <p>Items: {state.curRoom.items && state.curRoom.items.join(', ')}</p>
                         <p>Cooldown: {state.cooldown}</p>
                     </>}
                 </RoomDescription>
@@ -150,6 +167,12 @@ const Home = _ =>
                     <button onClick={handleSell}>Sell</button>
                     <button onClick={handleConfirmSell}>Confirm Sell</button>
                     <button onClick={handleStatus}>Status</button>
+                    <button onClick={handlePray}>Pray</button>
+                    <button onClick={handleDash} value="n_to">Dash N</button>
+                    <button onClick={handleDash} value="e_to">Dash E</button>
+                    <button onClick={handleDash} value="s_to">Dash S</button>
+                    <button onClick={handleDash} value="w_to">Dash W</button>
+                    {/* <button onClick={handleMine} >Mine</button> */}
                     <Traversal />
                 </Controls>
             </div>

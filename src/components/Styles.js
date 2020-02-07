@@ -19,8 +19,8 @@ export const MapContainer = styled.div`
     display: grid;
     background-color: gray;
     overflow: scroll;
-    grid-template-columns: repeat(80, 1fr);
-    grid-template-rows: repeat(80, 1fr);
+    grid-template-columns: repeat(40, 1fr);
+    grid-template-rows: repeat(40, 1fr);
 `;
 
 export const RoomDescription = styled.div`
@@ -79,29 +79,29 @@ export const Controls = styled.div`
 `;
 
 export const RoomDiv = styled.div`
-    grid-column-start: ${props => props.xCoord};
-    grid-row-start: ${props => 80 - props.yCoord};
-    height: 16px;
-    width: 16px;
-    font-size: 8px;
-    border: 1px solid;
+    grid-column-start: ${props => (props.xCoord - 45) };
+    grid-row-start: ${props => 40 - (props.yCoord - 40)};
+    height: 32px;
+    width: 32px;
+    font-size: 16px;
+    border: 3px solid;
     border-top-color: ${props => props.borderTop};
     border-right-color: ${props => props.borderRight};
     border-bottom-color: ${props => props.borderBottom};
     border-left-color: ${props => props.borderLeft};
-    background-color: yellow;
+    background-color: ${props => props.roomColor};
     /* .cur-room{
         border-color: red;
     } */
 `;
 
 export const CurRoomDiv = styled.div`
-    grid-column-start: ${props => props.xCoord};
-    grid-row-start: ${props => 80 - props.yCoord};
-    height: 16px;
-    width: 16px;
-    font-size: 10px;
-    border: 2px solid;
+    grid-column-start: ${props => (props.xCoord - 45)};
+    grid-row-start: ${props => 40 - (props.yCoord - 40)};
+    height: 32px;
+    width: 32px;
+    font-size: 16px;
+    border: 3px solid;
     border-top-color: ${props => props.borderTop};
     border-right-color: ${props => props.borderRight};
     border-bottom-color: ${props => props.borderBottom};
